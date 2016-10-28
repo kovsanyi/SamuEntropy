@@ -130,6 +130,7 @@ public class NorbironSurfaceView extends android.view.SurfaceView implements Run
     private static final String DROP_TABLE_NODES = "DROP TABLE IF EXISTS nodes";
     private boolean loading = false;
     private boolean deleted = false;
+    private boolean deleting = false;
     private long pressed = 0;
     //############----############
 
@@ -311,12 +312,18 @@ public class NorbironSurfaceView extends android.view.SurfaceView implements Run
                 }
             }
 
-            for (NeuronBox nb : nodeBoxes) {
-                //############++++############
-                if(nb.getType() != -1){
-                    nb.draw(-startsx, -startsy, canvas);
+            if(!deleting){
+                for (NeuronBox nb : nodeBoxes) {
+                    //############++++############
+                    if(nb.getType() != -1){
+                        nb.draw(-startsx, -startsy, canvas);
+                    }
+                    //############----############
                 }
-                //############----############
+            } else {
+                nodeBoxes.clear();
+                saveNodes();
+                deleting = false;
             }
             //############++++############
             canvas.drawBitmap(nodes.buildproci, null, new android.graphics.Rect(10, 10, 124, 138), null);
@@ -409,9 +416,7 @@ public class NorbironSurfaceView extends android.view.SurfaceView implements Run
             if (event.getX()<124+10 && event.getY()<138+10 && !loading){
                 if(System.currentTimeMillis() - pressed >= 500 && !deleted){
                     deleted = true;
-                    nodeBoxes.clear();
-                    saveNodes();
-                    repaint();
+                    deleting = true;
                     return true;
                 }
             }
